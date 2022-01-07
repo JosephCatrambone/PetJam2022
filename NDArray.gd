@@ -11,6 +11,21 @@ func _init(num_rows:int, num_columns:int):
 	self.columns = num_columns
 	self.data.resize(self.rows*self.columns)
 
+func zero_out():
+	for i in range(len(self.data)):
+		self.data[i] = 0.0
+
+func to_string():
+	var result = "["
+	for i in range(self.rows):
+		result += "["
+		for j in range(self.columns):
+			result += str(self.get_value(i, j))
+			result += ", "
+		result += "], \n"
+	result += "]"
+	return result
+
 func set_value(i:int, j:int, value:float):
 	# TODO: Assert i and j in range?
 	assert(i >= 0 and i < self.rows and j >= 0 and j <= self.columns)
