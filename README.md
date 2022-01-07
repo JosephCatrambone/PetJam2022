@@ -45,5 +45,9 @@ A cat has a bucket of world state that accumulates and gets added to a rolling b
 
 A full reinforcement learning system.  :getin:
 
+## Action Plan
 
-
+- Make a command wheel.  Decide on whether it should be stateful or not.  Probably stateful.
+- Make a basic cat component with placeholder stuff that can receive commands.
+- Make a basic cube room with some colliders to prevent the cat from going OOB.
+- Make an 'exam' which gives the user a challenge: issue each command and see if the animal (a) obeys within a certain amount of time and (b) does not require a re-issue of the order.
