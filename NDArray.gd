@@ -1,3 +1,7 @@
+"""
+NDArray.gd
+Not actually a true N-Dimensional array, but doesn't conflict with GDScript's Matrix class name.
+"""
 class_name NDArray
 extends Resource
 
@@ -6,17 +10,19 @@ var columns:int = 0
 var data:PoolRealArray = PoolRealArray()
 var broadcast:bool = false  # If true, will wrap all reads.
 
-func _init(num_rows:int, num_columns:int):
+func _init(num_rows:int, num_columns:int, init_value = null):
 	self.rows = num_rows
 	self.columns = num_columns
 	self.data.resize(self.rows*self.columns)
+	if init_value != null:
+		self.fill(init_value)
 
-func zero_out():
+func fill(value):
 	for i in range(len(self.data)):
-		self.data[i] = 0.0
+		self.data[i] = value
 
 func to_string():
-	var result = "["
+	var result = "[\n"
 	for i in range(self.rows):
 		result += "["
 		for j in range(self.columns):
@@ -39,19 +45,40 @@ func get_value(i:int, j:int) -> float:
 		j = j % self.columns
 	return self.data[j + i*self.columns]
 
+func set_row(i:int, row:Array):
+	assert(len(row) == self.columns)
+	for j in range(self.columns):
+		self.set_value(i, j, row[j])
+
+func set_column(j:int, column:Array):
+	assert(len(column) == self.rows)
+	for i in range(self.rows):
+		self.set_value(i, j, column[j])
+
 func foreach_unary(op):
 	var result = get_script().new(self.rows, self.columns)
-	for i in range(self.rows):
-		for j in range(self.columns):
-			# op.call is GDScript 4.0
-			result.set_value(op.call_func(self.get_value(i, j)))
+	
+	for x in range(len(self.data)):
+		# op.call is GDScript 4.0
+		result.data[x] = op.call_func(self.data[x])
+	
 	return result
 
 func foreach_binary(op, other):
 	var result = get_script().new(self.rows, self.columns)
-	for i in range(self.rows):
-		for j in range(self.columns):
-			result.set_value(i, j, op.call_func(self.get_value(i, j), other.get_value(i, j)))
+
+	# If our sizes match and we are not broadcasting, can co-iterate:
+	if self.rows == other.rows and self.columns == other.columns:
+		# Can use the fast co-iteration trick:
+		for x in range(len(self.data)):
+			# op.call is GDScript 4.0
+			result.data[x] = op.call_func(self.data[x], other.data[x])
+	else:
+		# This is slower, but will handle broadcasting:
+		for i in range(self.rows):
+			for j in range(self.columns):
+				result.set_value(i, j, op.call_func(self.get_value(i, j), other.get_value(i, j)))
+	
 	return result
 
 func _maybe_broadcast(value):
