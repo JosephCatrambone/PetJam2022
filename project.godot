@@ -10,12 +10,12 @@ config_version=4
 
 _global_script_classes=[ {
 "base": "Resource",
-"class": "NDArray",
+"class": "Matrix",
 "language": "GDScript",
-"path": "res://NDArray.gd"
+"path": "res://Matrix.gd"
 } ]
 _global_script_class_icons={
-"NDArray": ""
+"Matrix": ""
 }
 
 [application]

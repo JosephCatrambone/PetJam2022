@@ -1,8 +1,9 @@
 """
-NDArray.gd
-Not actually a true N-Dimensional array, but doesn't conflict with GDScript's Matrix class name.
+Matrix.gd
+
+A small, slow, 2D Float Matrix.
 """
-class_name NDArray
+class_name Matrix
 extends Resource
 
 var rows:int = 0
