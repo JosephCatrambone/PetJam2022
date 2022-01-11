@@ -1,20 +1,14 @@
 extends KinematicBody
 
-
-# Declare member variables here. Examples:
-# var a = 2
-# var b = "text"
-
-
-# Called when the node enters the scene tree for the first time.
-func _ready():
-	pass # Replace with function body.
+var happiness = 0.0
+onready var needs = $DesireController
 
 func get_interactions():
 	return ["Pet", "Scold", "Treat", "Feed", "Command"]
 
 func interact(action):
 	if action == "Command":
+		needs.step(1.0)
 		return ["Speak", "Sit", "Come", "Down"]
 	return null
 
