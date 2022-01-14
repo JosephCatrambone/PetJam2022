@@ -3,8 +3,6 @@ extends Node
 # This module tracks the basic needs of the cat and determines how the happiness should be impacted.
 # This does not directly record happiness.
 
-enum Actions { SLEEP, WANDER, FIND_FOOD, BOTHER_PERSON }
-
 class AnimalTrait:
 	var current_value = 0.0
 	var min_value = 0.0
