@@ -50,6 +50,11 @@ func open_menu(opts):
 	self.buttons.visible = true
 	self.tween.start()
 	yield(tween, "tween_completed")
+	
+	# HACK: All buttons start disabled so we don't accidentally mouseover them.  Enable all the buttons now.
+	for c in self.buttons.get_children():
+		c.disabled = false
+	
 
 func close_menu():
 	if self.open:
@@ -61,6 +66,9 @@ func close_menu():
 		self.tween.interpolate_property(self.buttons, "modulate", Color(1.0, 1.0, 1.0, 1.0), Color(1.0, 1.0, 1.0, 0.0), open_time, Tween.TRANS_BACK)
 		self.tween.start()
 		yield(tween, "tween_completed")
+		# HACK: All buttons start disabled so we don't accidentally mouseover them.  Enable all the buttons now.
+		for c in self.buttons.get_children():
+			c.disabled = true
 	self.open = false
 	self.buttons.visible = false
 
@@ -84,7 +92,7 @@ func _input(event):
 		var from = camera.project_ray_origin(event.position)
 		var to = from + camera.project_ray_normal(event.position) * ray_length
 		var space:PhysicsDirectSpaceState = camera.get_world().direct_space_state
-		var hit = space.intersect_ray(from, to, [self])
+		var hit = space.intersect_ray(from, to, [self], 0x7FFFFFFF, true, true)
 		if hit:
 			var collider = hit["collider"]
 			if collider and collider.has_method("get_interactions") and collider.has_method("interact"):

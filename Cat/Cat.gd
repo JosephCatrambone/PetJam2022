@@ -12,21 +12,20 @@ export var run_speed:float = 1.0
 #export var turn_rate:float = 1.0
 var walk_time = 0.0
 export var max_walk_time:float = 10.0  # If we are walking towards something for more than this long, we can't get there.
-var location_for_action:Dictionary = {
-	
-}
 
 # Different animal traits.
 export(float) var base_happiness:float = 0.5
 var current_happiness:float = 0.0
 var min_queue_priority = 0.1
 
+export(NodePath) var food_bowl
 export(Curve) var hunger_penalty:Curve  # As we move up from 0 to 1, what does the rescale seem like?
 export(float) var hunger_scale:float = 1.0  # How much does max hunger take priority?
 export(float) var hunger_growth_rate:float = 0.1  # How fast does hunger grow to 1.0 (max)?
 var hunger:float = 0.0
 var hunger_recovery_rate:float = 20.0
 
+export(NodePath) var bed
 export(Curve) var tired_penalty:Curve  # As we move from 0 to 1, how does our tirendess begin to impact us.
 export(float) var tired_scale:float = 1.0  # How much does max sleepiness take priority?
 export(float) var tired_growth_rate:float = 0.2  # How fast do we get tired?
@@ -38,10 +37,11 @@ func _process(delta):
 	var current_action = self.get_command()
 	
 	# Are we at the location we need to be for the active action?
-	var moving_to_action = false
-	if current_action in self.location_for_action:
-		moving_to_action = self.move_to(delta, self.location_for_action[current_action])
-	if moving_to_action:
+	var at_target = true
+	var target = self.get_location_for_action(current_action)
+	if target:
+		at_target = self.move_to(delta, target)
+	if not at_target:
 		return  # Working on getting there.
 
 	# Execute the plan!
@@ -92,15 +92,23 @@ func update_needs(delta):
 	if tired_unhappiness > self.min_queue_priority:
 		self.queue_command("sleep", tired_unhappiness)
 	self.current_happiness -= tired_unhappiness
-	
+
+func get_location_for_action(action:String):
+	if action == "eat" and food_bowl:
+		var fb:Spatial = get_node(food_bowl)
+		return fb.transform.origin
+	if action == "sleep" and bed:
+		var cb:Spatial = get_node(bed)
+		return cb.transform.origin
+	return null
 
 func move_to(delta:float, move_target: Vector3) -> bool:
 	# Move to the given target and return true if we're close enough.
 	# Avoid getting stuck:
 	self.walk_time += delta
-	var dpos = self.global_transform.origin - move_target
+	var dpos = move_target - self.global_transform.origin
 	self.move_and_slide(Vector3(dpos.x, 0.0, dpos.z).normalized()*walk_speed)
-	if dpos.length_squared() < walk_speed or self.walk_time > self.max_walk_time:
+	if dpos.length() < walk_speed*0.1 or self.walk_time > self.max_walk_time:
 		# Arrived.
 		self.walk_time = 0.0
 		return true
