@@ -12,6 +12,13 @@ func _ready():
 func has_food():
 	return self.fill > 0.1
 
+func eat(amount):
+	# Return the amount eaten and update this fill.
+	amount = min(amount, self.fill)
+	self.fill -= amount
+	self.need_mesh_refresh = true
+	return amount
+
 # Handle interactible pieces.
 func get_interactions():
 	return ["fill", "empty", "clean"]
@@ -22,7 +29,7 @@ func interact(action):
 	elif action == "empty" or action == "clean":
 		self.fill = 0.0
 	elif action == "eat":
-		self.fill -= 0.1
+		self.fill -= 0.01
 	self.need_mesh_refresh = true
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.

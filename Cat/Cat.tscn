@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=2]
+[gd_scene load_steps=7 format=2]
 
 [ext_resource path="res://Cat/Cat.gd" type="Script" id=1]
 [ext_resource path="res://Assets/cat.obj" type="ArrayMesh" id=2]
@@ -9,6 +9,9 @@ _data = [ Vector2( 0, 0 ), 0.0, 0.0, 0, 0, Vector2( 0.28125, 0 ), 0.0484848, 0.0
 [sub_resource type="Curve" id=3]
 _data = [ Vector2( 0, 0 ), 0.0, 0.0, 0, 0, Vector2( 0.518868, 0 ), 0.0, 0.0, 0, 0, Vector2( 0.787736, 0.745454 ), -3.77075, -3.77075, 0, 0, Vector2( 1, 1 ), 2.32406, 0.0, 0, 0 ]
 
+[sub_resource type="Curve" id=4]
+_data = [ Vector2( 0, 0 ), 0.0, 0.0, 0, 0, Vector2( 0.433962, 0.345455 ), 0.0, 0.0, 0, 0, Vector2( 1, 0.272727 ), 0.0, 0.0, 0, 0 ]
+
 [sub_resource type="BoxShape" id=1]
 extents = Vector3( 0.25, 0.25, 0.25 )
 
@@ -16,6 +19,9 @@ extents = Vector3( 0.25, 0.25, 0.25 )
 script = ExtResource( 1 )
 hunger_penalty = SubResource( 2 )
 tired_penalty = SubResource( 3 )
+bored_penalty = SubResource( 4 )
+bored_scale = 0.5
+bored_growth_rate = 0.2
 
 [node name="CollisionShape" type="CollisionShape" parent="."]
 transform = Transform( 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.220831, 0 )

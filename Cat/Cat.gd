@@ -18,19 +18,29 @@ export(float) var base_happiness:float = 0.5
 var current_happiness:float = 0.0
 var min_queue_priority = 0.1
 
+# HUNGER
 export(NodePath) var food_bowl
 export(Curve) var hunger_penalty:Curve  # As we move up from 0 to 1, what does the rescale seem like?
 export(float) var hunger_scale:float = 1.0  # How much does max hunger take priority?
-export(float) var hunger_growth_rate:float = 0.1  # How fast does hunger grow to 1.0 (max)?
+export(float) var hunger_growth_rate:float = 0.01  # How fast does hunger grow to 1.0 (max)?
 var hunger:float = 0.0
-var hunger_recovery_rate:float = 20.0
+var hunger_recovery_rate:float = 1.0  # This MUST be higher than hunger growth rate.
 
+# SLEEP
 export(NodePath) var bed
 export(Curve) var tired_penalty:Curve  # As we move from 0 to 1, how does our tirendess begin to impact us.
 export(float) var tired_scale:float = 1.0  # How much does max sleepiness take priority?
-export(float) var tired_growth_rate:float = 0.2  # How fast do we get tired?
+export(float) var tired_growth_rate:float = 0.01  # How fast do we get tired?
 var tired:float = 0.0
-var sleep_recovery_rate:float = 10.0
+var sleep_recovery_rate:float = 1.0
+
+# BOREDOM
+export(Curve) var bored_penalty:Curve
+export(float) var bored_scale:float = 1.0
+export(float) var bored_growth_rate:float = 0.1
+var bored:float = 0.0
+var bored_recovery_rate:float = 1.0
+
 
 func _process(delta):
 	self.update_needs(delta)
@@ -70,11 +80,18 @@ func _process(delta):
 				self.complete_command()
 		
 		"eat":
-			print("Cat is eating")
-			self.hunger -= self.hunger_recovery_rate*delta
-			if self.hunger <= 0.0:
-				self.hunger = 0.0
-				self.complete_command()
+			# We are at the bowl.
+			var b = get_node(food_bowl)
+			# TODO: This is tight coupling.  Fix it.
+			if not b.has_food():
+				# Meow or something.
+				pass
+			else:
+				var amount_eaten = b.eat(self.hunger_recovery_rate*delta)
+				self.hunger -= amount_eaten
+				if self.hunger <= 0.0:
+					self.hunger = 0.0
+					self.complete_command()
 
 func update_needs(delta):
 	self.current_happiness = self.base_happiness
